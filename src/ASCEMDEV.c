@@ -18,14 +18,11 @@
 	Apple Sound Chip EMulated DEVice
 */
 
-#ifndef AllFiles
-#include "SYSDEPNS.h"
-#include "ENDIANAC.h"
-#include "MYOSGLUE.h"
-#include "EMCONFIG.h"
-#include "GLOBGLUE.h"
+#include "PICOMMON.h"
+
+#if EmASC
+
 #include "VIAEMDEV.h"
-#endif
 
 #include "ASCEMDEV.h"
 
@@ -866,3 +863,5 @@ label_retry:
 	}
 #endif
 }
+
+#endif /* EmASC */

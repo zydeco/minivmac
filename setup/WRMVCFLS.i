@@ -459,8 +459,10 @@ LOCALPROC WriteMVCMakeFile(void)
 					WriteCStrToDestFile(" -Wl,-no_pie");
 				}
 				WriteCStrToDestFile(" -nodefaultlibs -lSystem");
-				if ((gbk_targ_mach == cur_targ) && WantLocalTalk) {
-					WriteCStrToDestFile(" -lSystemStubs");
+				if (gbk_targ_mach == cur_targ) {
+					if (WantLocalTalk || CurUseAllFiles) {
+						WriteCStrToDestFile(" -lSystemStubs");
+					}
 				}
 			} else if (gbk_apifam_win == gbo_apifam) {
 				WritePathArgInMakeCmnd(WriteMainRsrcObjPath);
@@ -474,18 +476,26 @@ LOCALPROC WriteMVCMakeFile(void)
 				} else {
 					WriteCStrToDestFile(
 						" -mwindows -lwinmm -lole32 -luuid");
+					if (WantLocalTalk || CurUseAllFiles) {
+						WriteCStrToDestFile(" -lwsock32");
+					}
 				}
 			} else {
 				if (gbk_targfam_slrs == gbo_targfam) {
 					WriteCStrToDestFile(" -lposix4");
 				}
 #if MayUseSound
-				if (gbk_sndapi_alsa == gbo_sndapi) {
+				if ((gbk_sndapi_alsa == gbo_sndapi)
+					|| CurUseAllFiles)
+				{
 					WriteCStrToDestFile(" -ldl");
 #if 0
 					WriteCStrToDestFile(" -lasound");
 #endif
-				} else if (gbk_sndapi_ddsp == gbo_sndapi) {
+				}
+				if ((gbk_sndapi_ddsp == gbo_sndapi)
+					|| CurUseAllFiles)
+				{
 					if ((gbk_targfam_nbsd == gbo_targfam)
 						|| (gbk_targfam_obsd == gbo_targfam))
 					{

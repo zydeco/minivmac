@@ -1,7 +1,7 @@
 /*
-	SCCEMDEV.h
+	OSGCOMUD.h
 
-	Copyright (C) 2004 Philip Cummins, Paul C. Pratt
+	Copyright (C) 2020 Paul C. Pratt
 
 	You can redistribute this file and/or modify it under the terms
 	of version 2 of the GNU General Public License as published by
@@ -14,18 +14,29 @@
 	license for more details.
 */
 
-#ifdef SCCEMDEV_H
+/*
+	Operating System Glue COMmon includes, User options Dependent
+
+	Second include of OSGLUxxx files. All things in common
+	that can not go in OSGLCMUI, because they depend on user options.
+*/
+
+#ifdef OSGCOMUD_H
 #error "header already included"
 #else
-#define SCCEMDEV_H
+#define OSGCOMUD_H
 #endif
 
-EXPORTPROC SCC_Reset(void);
+#include "CNFUDOSG.h"
+	/*
+		Configuration file dependent on user options
+		for operating system glue.
+	*/
+#include "CNFUDALL.h"
+	/*
+		Configuration file dependent on user options
+		for all code.
+	*/
+#include "OSGLUAAA.h"
 
-EXPORTFUNC ui5b SCC_Access(ui5b Data, blnr WriteMem, CPTR addr);
-
-EXPORTFUNC blnr SCC_InterruptsEnabled(void);
-
-#if EmLocalTalk
-EXPORTPROC LocalTalkTick(void);
-#endif
+#include "STRCONST.h"

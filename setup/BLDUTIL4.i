@@ -27,8 +27,7 @@ LOCALPROC WriteOutDummyContents(void)
 LOCALPROC WriteMakeOutputDirectories(void)
 {
 	if ((gbk_ide_xcd == cur_ide) && (! UseCmndLine)) {
-	} else
-	if (gbk_ide_mw8 == cur_ide) {
+	} else if (gbk_ide_mw8 == cur_ide) {
 	} else {
 		WriteSectionCommentDestFile("make output directory");
 
@@ -42,72 +41,65 @@ LOCALPROC WriteMakeOutputDirectories(void)
 
 LOCALPROC WriteIdeSpecificFiles(void)
 {
-#if gbk_ide_mpw == cur_ide
-	WriteMPWSpecificFiles();
-#endif
-
-#if gbk_ide_mvc == cur_ide
-	WriteMVCSpecificFiles();
-#endif
-
-#if (gbk_ide_bgc == cur_ide) \
-	|| (gbk_ide_cyg == cur_ide) \
-	|| (gbk_ide_mgw == cur_ide) \
-	|| (gbk_ide_dkp == cur_ide)
-	WriteBashGccSpecificFiles();
-#endif
-
-#if gbk_ide_mw8 == cur_ide
-	WriteMetrowerksSpecificFiles();
-#endif
-
-#if gbk_ide_snc == cur_ide
-	WriteSncSpecificFiles();
-#endif
-
-#if gbk_ide_msv == cur_ide
-	WriteMsvSpecificFiles();
-#endif
-
-#if gbk_ide_lcc == cur_ide
-	if (UseCmndLine) {
-		WriteLccW32clSpecificFiles();
-	} else {
-		WriteLccW32SpecificFiles();
+	switch (cur_ide) {
+		case gbk_ide_mpw:
+			WriteMPWSpecificFiles();
+			break;
+		case gbk_ide_mvc:
+			WriteMVCSpecificFiles();
+			break;
+		case gbk_ide_bgc:
+		case gbk_ide_cyg:
+		case gbk_ide_mgw:
+		case gbk_ide_dkp:
+			WriteBashGccSpecificFiles();
+			break;
+		case gbk_ide_mw8:
+			WriteMetrowerksSpecificFiles();
+			break;
+		case gbk_ide_snc:
+			WriteSncSpecificFiles();
+			break;
+		case gbk_ide_msv:
+			WriteMsvSpecificFiles();
+			break;
+		case gbk_ide_lcc:
+			if (UseCmndLine) {
+				WriteLccW32clSpecificFiles();
+			} else {
+				WriteLccW32SpecificFiles();
+			}
+			break;
+		case gbk_ide_dvc:
+			if (UseCmndLine) {
+				WriteBashGccSpecificFiles();
+			} else {
+				WriteDevCSpecificFiles();
+			}
+			break;
+		case gbk_ide_xcd:
+			if (UseCmndLine) {
+				WriteBashGccSpecificFiles();
+			} else {
+				WriteXCDSpecificFiles();
+			}
+			break;
+		case gbk_ide_dmc:
+			WriteDMCSpecificFiles();
+			break;
+		case gbk_ide_plc:
+			if (UseCmndLine) {
+				WritePLCclSpecificFiles();
+			} else {
+				WritePLCSpecificFiles();
+			}
+			break;
+		case gbk_ide_ccc:
+			WriteCccSpecificFiles();
+			break;
+		default:
+			break;
 	}
-#endif
-
-#if gbk_ide_dvc == cur_ide
-	if (UseCmndLine) {
-		WriteBashGccSpecificFiles();
-	} else {
-		WriteDevCSpecificFiles();
-	}
-#endif
-
-#if gbk_ide_xcd == cur_ide
-	if (UseCmndLine) {
-		WriteBashGccSpecificFiles();
-	} else {
-		WriteXCDSpecificFiles();
-	}
-#endif
-
-#if gbk_ide_dmc == cur_ide
-	WriteDMCSpecificFiles();
-#endif
-
-#if gbk_ide_plc == cur_ide
-	if (UseCmndLine) {
-		WritePLCclSpecificFiles();
-	} else {
-		WritePLCSpecificFiles();
-	}
-#endif
-
-#if gbk_ide_ccc == cur_ide
-	WriteCccSpecificFiles();
-#endif
 }
 
 LOCALPROC ResetAllCommandLineParameters(void)
@@ -238,23 +230,19 @@ LOCALPROC MakeConfigFolder(void)
 	MakeSubDirectory("my_config_d", "my_project_d", cfg_d_name, "");
 }
 
-#if WantWriteVarName
 LOCALPROC WriteAppVariationStr1(void)
 {
 	WriteBgnDestFileLn();
 	WriteAppVariationStr();
 	WriteEndDestFileLn();
 }
-#endif
 
-#if WantWriteBldOpts
 LOCALPROC WriteBldOpts1(void)
 {
 	WriteBgnDestFileLn();
 	WriteBldOpts();
 	WriteEndDestFileLn();
 }
-#endif
 
 LOCALFUNC tMyErr DoTheCommand(void)
 {
@@ -271,28 +259,29 @@ LOCALFUNC tMyErr DoTheCommand(void)
 	{
 		WriteScriptLangHeader();
 
+		if (CurPrintVarName) {
+			WriteADstFile1("my_project_d",
+				"var_name", "", "variation name",
+				WriteAppVariationStr1);
+		}
+
+		if (CurPrintVarOpts) {
+			WriteADstFile1("my_project_d",
+				"bld_opts", "", "build options",
+				WriteBldOpts1);
+		}
+
 		WriteMakeOutputDirectories();
 
 		MakeConfigFolder();
 
 		WriteConfigFiles();
 
+		WriteIdeSpecificFiles();
+
 		if (CurPrintCFiles) {
 			WriteCFilesList();
 		}
-
-#if WantWriteVarName
-		WriteADstFile1("my_project_d",
-			"var_name", "", "variation name",
-			WriteAppVariationStr1);
-#endif
-#if WantWriteBldOpts
-		WriteADstFile1("my_project_d",
-			"bld_opts", "", "build options",
-			WriteBldOpts1);
-#endif
-
-		WriteIdeSpecificFiles();
 	}
 
 	return err;

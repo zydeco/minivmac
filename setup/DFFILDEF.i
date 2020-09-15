@@ -62,3 +62,5 @@ typedef void (*tWriteOneDocType)(
 #define CSrcFlagsUseIf(b) ((b) ? kCSrcFlgmNone : kCSrcFlgmSkip)
 #define CSrcFlagsUseHdrIf(b) (CSrcFlagsUseIf(b) | kCSrcFlgmNoSource)
 #define CSrcFlagsUseSrcIf(b) (CSrcFlagsUseIf(b) | kCSrcFlgmNoHeader)
+
+#define CSrcFlagsUseIfA(b) CSrcFlagsUseIf(b || CurUseAllFiles)

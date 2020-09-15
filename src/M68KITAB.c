@@ -18,13 +18,7 @@
 	Motorola 68K Instructions TABle
 */
 
-#ifndef AllFiles
-#include "SYSDEPNS.h"
-#endif
-
-#include "MYOSGLUE.h"
-#include "EMCONFIG.h"
-#include "GLOBGLUE.h"
+#include "PICOMMON.h"
 
 #include "M68KITAB.h"
 

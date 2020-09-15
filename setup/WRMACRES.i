@@ -142,7 +142,7 @@ LOCALPROC WriteMacResConfigContents(void)
 	{
 		WriteQuotedInclude("Carbon.r");
 	} else
-	if (gbk_ide_mpw == cur_ide) {
+	{
 		WriteQuotedInclude("Types.r");
 		WriteQuotedInclude("Icons.r");
 	}

@@ -17,11 +17,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "COREDEFS.i"
 
-#include "CNFGOPTS.i"
-#include "CONFIGUR.i"
-#include "CNFGDLFT.i"
+#include "COREDEFS.i"
 
 
 #define MyMoveBytes(src, dst, n) \
@@ -34,19 +31,12 @@
 #define kMyErrNoMatch 1030
 	/* (so try something else) always should be handled, not reported */
 
-#if NeedSegmenting
-#pragma segment Utilities
-#endif
 
 #include "STRUTILS.i"
 
 #include "CMDARGT1.i"
 
 #include "WRTEXTFL.i"
-
-#if NeedSegmenting
-#pragma segment Body
-#endif
 
 #include "SPBASDEF.i"
 
@@ -55,18 +45,10 @@
 #include "SPBLDOPT.i"
 #endif
 
-#if NeedSegmenting
-#pragma segment Body1
-#endif
-
 #include "BLDUTIL3.i"
 
 #include "DFFILDEF.i"
 #include "SPFILDEF.i"
-
-#if NeedSegmenting
-#pragma segment Body2
-#endif
 
 #include "USFILDEF.i"
 #include "WRMACRES.i"
@@ -74,66 +56,18 @@
 #include "WRCNFGGL.i"
 #include "WRCNFGAP.i"
 
-#if NeedSegmenting
-#pragma segment Body3
-#endif
-
-#if gbk_ide_mpw == cur_ide
 #include "WRMPWFLS.i"
-#endif
-
-#if gbk_ide_mw8 == cur_ide
 #include "WRMW8FLS.i"
-#endif
-
-#if gbk_ide_mvc == cur_ide
 #include "WRMVCFLS.i"
-#endif
-
-#if (gbk_ide_bgc == cur_ide) \
-	|| (gbk_ide_cyg == cur_ide) \
-	|| (gbk_ide_mgw == cur_ide) \
-	|| (gbk_ide_dkp == cur_ide) \
-	|| (gbk_ide_dvc == cur_ide) \
-	|| (gbk_ide_xcd == cur_ide)
 #include "WRBGCFLS.i"
-#endif
-
-#if gbk_ide_snc == cur_ide
 #include "WRSNCFLS.i"
-#endif
-
-#if gbk_ide_msv == cur_ide
 #include "WRMSCFLS.i"
-#endif
-
-#if gbk_ide_lcc == cur_ide
 #include "WRLCCFLS.i"
-#endif
-
-#if gbk_ide_dvc == cur_ide
 #include "WRDVCFLS.i"
-#endif
-
-#if gbk_ide_xcd == cur_ide
 #include "WRXCDFLS.i"
-#endif
-
-#if gbk_ide_dmc == cur_ide
 #include "WRDMCFLS.i"
-#endif
-
-#if gbk_ide_plc == cur_ide
 #include "WRPLCFLS.i"
-#endif
-
-#if gbk_ide_ccc == cur_ide
 #include "WRCCCFLS.i"
-#endif
-
-#if NeedSegmenting
-#pragma segment Body4
-#endif
 
 #ifdef Have_SPCNFGGL
 #include "SPCNFGGL.i"
@@ -142,10 +76,6 @@
 #include "SPCNFGAP.i"
 #endif
 #include "SPOTHRCF.i"
-
-#if NeedSegmenting
-#pragma segment Main
-#endif
 
 #include "BLDUTIL4.i"
 

@@ -30,19 +30,12 @@
 		(this code now located in "FPCPEMDV.h")
 */
 
-#ifndef AllFiles
-#include "SYSDEPNS.h"
-
-#include "MYOSGLUE.h"
-#include "ENDIANAC.h"
-#include "EMCONFIG.h"
-#include "GLOBGLUE.h"
+#include "PICOMMON.h"
 
 #include "M68KITAB.h"
 
 #if WantDisasm
 #include "DISAM68K.h"
-#endif
 #endif
 
 #include "MINEM68K.h"
@@ -7847,7 +7840,7 @@ LOCALIPROC DoBitField(void)
 	if (width != 0) {
 		tmp >>= (32 - width);
 	}
-	ZFLG = tmp == 0;
+	ZFLG = (tmp == 0);
 	VFLG = 0;
 	CFLG = 0;
 
@@ -7898,6 +7891,21 @@ LOCALIPROC DoBitField(void)
 			newtmp = m68k_dreg((extra >> 12) & 7);
 			if (width != 0) {
 				newtmp &= ((1 << width) - 1);
+			}
+
+			/*
+				flags set from new value
+				unlike BFSET/BFCLR/BFCHG
+			*/
+			{
+				ui5b t = newtmp;
+
+				if (width != 0) {
+					t <<= (32 - width);
+				}
+
+				NFLG = Bool2Bit(((si5b)t) < 0);
+				ZFLG = (0 == t);
 			}
 			break;
 	}

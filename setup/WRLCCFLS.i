@@ -136,7 +136,7 @@ LOCALPROC WriteLccW32WorkSpaceFile(void)
 
 	WriteBgnDestFileLn();
 	WriteCStrToDestFile("CurrentFile=");
-	WriteCNFGGLOBPath();
+	WriteCNFUIALLPath();
 	WriteEndDestFileLn();
 
 	WriteDestFileLn("OpenFiles=1");
@@ -144,7 +144,7 @@ LOCALPROC WriteLccW32WorkSpaceFile(void)
 	WriteBgnDestFileLn();
 	WriteCStrToDestFile("OpenFile1=");
 	WriteQuoteToDestFile();
-	WriteCNFGGLOBPath();
+	WriteCNFUIALLPath();
 	WriteQuoteToDestFile();
 	WriteCStrToDestFile(" 1 29 14 532 435");
 	WriteEndDestFileLn();

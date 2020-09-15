@@ -18,15 +18,12 @@
 	PROGram MAIN.
 */
 
-#ifndef AllFiles
-#include "SYSDEPNS.h"
-
-#include "MYOSGLUE.h"
-#include "EMCONFIG.h"
-#include "GLOBGLUE.h"
+#include "PICOMMON.h"
 #include "M68KITAB.h"
 #include "MINEM68K.h"
+#if EmVIA1
 #include "VIAEMDEV.h"
+#endif
 #if EmVIA2
 #include "VIA2EMDV.h"
 #endif
@@ -39,9 +36,11 @@
 #include "SCSIEMDV.h"
 #include "SONYEMDV.h"
 #include "SCRNEMDV.h"
+
 #if EmVidCard
 #include "VIDEMDEV.h"
 #endif
+
 #if EmClassicKbrd
 #include "KBRDEMDV.h"
 #elif EmPMU
@@ -49,15 +48,15 @@
 #else
 #include "ADBEMDEV.h"
 #endif
-#if EmASC
-#include "ASCEMDEV.h"
-#else
-#if MySoundEnabled && (CurEmMd != kEmMd_PB100)
+
+#if EmClassicSnd
 #include "SNDEMDEV.h"
 #endif
+#if EmASC
+#include "ASCEMDEV.h"
 #endif
+
 #include "MOUSEMDV.h"
-#endif
 
 
 #include "PROGMAIN.h"
@@ -73,7 +72,9 @@ LOCALPROC EmulatedHardwareZap(void)
 	IWM_Reset();
 	SCC_Reset();
 	SCSI_Reset();
+#if EmVIA1
 	VIA1_Zap();
+#endif
 #if EmVIA2
 	VIA2_Zap();
 #endif
@@ -113,14 +114,12 @@ LOCALPROC SubTickNotify(int SubTick)
 	dbglog_writeNum(SubTick);
 	dbglog_writeReturn();
 #endif
-#if EmASC
+#if EmClassicSnd
+	MacSound_SubTick(SubTick);
+#elif EmASC
 	ASC_SubTick(SubTick);
 #else
-#if MySoundEnabled && (CurEmMd != kEmMd_PB100)
-	MacSound_SubTick(SubTick);
-#else
 	UnusedParam(SubTick);
-#endif
 #endif
 }
 
@@ -201,7 +200,9 @@ LOCALPROC ExtraTimeBeginNotify(void)
 	dbglog_writeCStr("begin extra time");
 	dbglog_writeReturn();
 #endif
+#if EmVIA1
 	VIA1_ExtraTimeBegin();
+#endif
 #if EmVIA2
 	VIA2_ExtraTimeBegin();
 #endif
@@ -209,7 +210,9 @@ LOCALPROC ExtraTimeBeginNotify(void)
 
 LOCALPROC ExtraTimeEndNotify(void)
 {
+#if EmVIA1
 	VIA1_ExtraTimeEnd();
+#endif
 #if EmVIA2
 	VIA2_ExtraTimeEnd();
 #endif
@@ -276,12 +279,14 @@ LOCALPROC ICT_DoTask(int taskid)
 			PMU_DoTask();
 			break;
 #endif
+#if EmVIA1
 		case kICT_VIA1_Timer1Check:
 			VIA1_DoTimer1Check();
 			break;
 		case kICT_VIA1_Timer2Check:
 			VIA1_DoTimer2Check();
 			break;
+#endif
 #if EmVIA2
 		case kICT_VIA2_Timer1Check:
 			VIA2_DoTimer1Check();
@@ -431,8 +436,8 @@ LOCALFUNC blnr MoreSubTicksToDo(void)
 
 	if (ExtraTimeNotOver() && (ExtraSubTicksToDo > 0)) {
 #if EnableAutoSlow
-		if ((QuietSubTicks >= 16384)
-			&& (QuietTime >= 34)
+		if ((QuietSubTicks >= kAutoSlowSubTicks)
+			&& (QuietTime >= kAutoSlowTime)
 			&& ! WantNotAutoSlow)
 		{
 			ExtraSubTicksToDo = 0;

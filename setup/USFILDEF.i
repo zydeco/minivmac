@@ -453,7 +453,9 @@ LOCALPROC DoSrcFileMakeCompileDeps(void)
 	if (DoSrcFile_gd()->depends != nullpr) {
 		DoSrcFile_gd()->depends(DoSrcDependsMakeCompile);
 	}
-	WriteMakeDependFile(WriteCNFGGLOBPath);
+/*
+	WriteMakeDependFile(WriteCNFUIALLPath);
+*/
 }
 
 LOCALPROC DoSrcFileMakeCompileBody(void)

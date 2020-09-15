@@ -21,7 +21,7 @@
 */
 
 
-LOCALPROC WriteAppSpecificCNFGRAPIoptions(void)
+LOCALPROC WriteAppSpecificCNFUDOSGoptions(void)
 {
 	WriteBlankLineToDestFile();
 	WriteBgnDestFileLn();
@@ -125,16 +125,6 @@ LOCALPROC WriteAppSpecificCNFGRAPIoptions(void)
 		WriteDefineUimr("dbglog_buflnsz", dbglog_buflnsz);
 	}
 
-	if (gbk_targfam_wnce == gbo_targfam) {
-		WriteBlankLineToDestFile();
-		WriteDestFileLn("#define EnableShellLinks 0");
-		WriteDestFileLn("#define EnableDragDrop 0");
-		WriteDestFileLn("#define UseTimerThread 0");
-	} else if (gbk_targfam_lnds == gbo_targfam) {
-		WriteDestFileLn("#define EnableDragDrop 0");
-	} else {
-		WriteDestFileLn("#define EnableDragDrop 1");
-	}
 	WriteCompCondBool("SaveDialogEnable", gbo_SaveDialogEnable);
 	WriteCompCondBool("EnableAltKeysMode", WantAltKeysMode);
 	{
@@ -224,32 +214,10 @@ LOCALPROC WriteAppSpecificCNFGRAPIoptions(void)
 	WriteCompCondBool("WantEnblCtrlRst", WantEnblCtrlRst);
 	WriteCompCondBool("WantEnblCtrlKtg", WantEnblCtrlKtg);
 
-	WriteCompCondBool("NeedRequestInsertDisk",
-		(gbk_apifam_gtk == gbo_apifam)
-		|| (gbk_apifam_mac == gbo_apifam)
-		|| (gbk_apifam_win == gbo_apifam)
-		|| (gbk_apifam_osx == gbo_apifam)
-		|| (gbk_apifam_cco == gbo_apifam)
-		);
-
 	if (WantInsertIthDisk) {
 		WriteDestFileLn("#define NeedRequestIthDisk 1");
 	}
 
-	WriteCompCondBool("NeedDoMoreCommandsMsg",
-		(gbk_apifam_gtk == gbo_apifam)
-		|| (gbk_apifam_mac == gbo_apifam)
-		|| (gbk_apifam_win == gbo_apifam)
-		|| (gbk_apifam_osx == gbo_apifam)
-		|| (gbk_apifam_cco == gbo_apifam)
-		);
-	WriteCompCondBool("NeedDoAboutMsg",
-		(gbk_apifam_gtk == gbo_apifam)
-		|| (gbk_apifam_mac == gbo_apifam)
-		|| (gbk_apifam_win == gbo_apifam)
-		|| (gbk_apifam_osx == gbo_apifam)
-		|| (gbk_apifam_cco == gbo_apifam)
-		);
 	WriteCompCondBool("UseControlKeys", trueblnr);
 	WriteCompCondBool("UseActvCode", WantActvCode);
 	WriteCompCondBool("EnableDemoMsg", WantDemoMsg);
@@ -278,9 +246,4 @@ LOCALPROC WriteAppSpecificCNFGRAPIoptions(void)
 	if (gbk_apifam_win == gbo_apifam) {
 		WriteCompCondBool("ItnlKyBdFix", ItnlKyBdFix);
 	}
-	WriteCDefQuote("kStrAppName", WriteStrAppUnabrevName);
-	WriteCDefQuote("kAppVariationStr", WriteAppVariationStr);
-	WriteCDefQuote("kStrCopyrightYear", WriteAppCopyrightYearStr);
-	WriteCDefQuote("kMaintainerName", WriteMaintainerName);
-	WriteCDefQuote("kStrHomePage", WriteHomePage);
 }

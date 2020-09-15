@@ -17,7 +17,7 @@
 	program SPecific CoNFiGuration GLobals
 */
 
-LOCALPROC WriteAppSpecificCNFGGLOBoptions(void)
+LOCALPROC WriteAppSpecificCNFUDALLoptions(void)
 {
 	WriteBlankLineToDestFile();
 
@@ -38,6 +38,8 @@ LOCALPROC WriteAppSpecificCNFGGLOBoptions(void)
 	WriteBlankLineToDestFile();
 
 	WriteDefineUimr("NumDrives", cur_numdrives);
+
+	WriteCompCondBool("NonDiskProtect", NonDiskProtect);
 
 	WriteCompCondBool("IncludeSonyRawMode", (! WantMinExtn)
 		&& (gbk_apifam_nds != gbo_apifam));
@@ -97,6 +99,9 @@ LOCALPROC WriteAppSpecificCNFGGLOBoptions(void)
 
 	WriteDestFileLn("#define EnableAutoSlow 1");
 	WriteCompCondBool("EmLocalTalk", WantLocalTalk);
+	if (WantLocalTalk) {
+		WriteDestFileLn("#define LT_MayHaveEcho 1");
+	}
 
 	WriteCompCondBool("AutoLocation", WantAutoLocation);
 	WriteCompCondBool("AutoTimeZone", WantAutoTimeZone);

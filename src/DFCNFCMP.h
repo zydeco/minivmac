@@ -1,5 +1,5 @@
 /*
-	SYSDEPNS.h
+	DFCNFCMP.h
 
 	Copyright (C) 2006 Bernd Schmidt, Philip Cummins, Paul C. Pratt
 
@@ -15,16 +15,14 @@
 */
 
 /*
-	SYStem DEPeNdencies.
+	DeFaults for CoNFiguration of CoMPiler
 */
 
-#ifdef SYSDEPNS_H
+#ifdef DFCNFCMP_H
 #error "header already included"
 #else
-#define SYSDEPNS_H
+#define DFCNFCMP_H
 #endif
-
-#include "CNFGGLOB.h"
 
 
 typedef ui3b *ui3p;
@@ -68,23 +66,13 @@ typedef si5r simr;
 #endif
 
 #define LOCALVAR static
-#ifdef AllFiles
-#define GLOBALVAR LOCALVAR
-#define EXPORTVAR(t, v)
-#else
 #define GLOBALVAR
 #define EXPORTVAR(t, v) extern t v;
-#endif
 
 #define LOCALFUNC static MayNotInline
 #define FORWARDFUNC LOCALFUNC
-#ifdef AllFiles
-#define GLOBALFUNC LOCALFUNC
-#define EXPORTFUNC LOCALFUNC
-#else
 #define GLOBALFUNC MayNotInline
 #define EXPORTFUNC extern
-#endif
 #define IMPORTFUNC EXPORTFUNC
 #define TYPEDEFFUNC typedef
 
@@ -110,11 +98,6 @@ typedef si5r simr;
 		are called by rest of program.
 	*/
 
-/*
-	best type for ui4r that is probably in register
-	(when compiler messes up otherwise)
-*/
-
 #ifndef BigEndianUnaligned
 #define BigEndianUnaligned 0
 #endif
@@ -122,6 +105,11 @@ typedef si5r simr;
 #ifndef LittleEndianUnaligned
 #define LittleEndianUnaligned 0
 #endif
+
+/*
+	best type for ui4r that is probably in register
+	(when compiler messes up otherwise)
+*/
 
 #ifndef ui3rr
 #define ui3rr ui3r

@@ -17,27 +17,53 @@
 	WRite "CNFGrAPi.h"
 */
 
-LOCALPROC WriteOSXLocalTalkCNFGRAPI(void)
+LOCALPROC WriteOSXLocalTalkCNFUIOSG(void)
 {
-	WriteDestFileLn("#include <unistd.h>");
-	WriteDestFileLn("#include <netinet/in.h>");
 	WriteDestFileLn("#include <sys/socket.h>");
-	WriteDestFileLn("#include <net/if.h>");
-	WriteDestFileLn("#include <net/route.h>");
-	WriteDestFileLn("#include <net/if_dl.h>");
 	WriteDestFileLn("#include <arpa/inet.h>");
-	WriteDestFileLn("#include <sys/select.h>");
-	WriteDestFileLn("#include <sys/ioctl.h>");
-	WriteDestFileLn("#include <sys/sysctl.h>");
-	WriteDestFileLn("#include <net/bpf.h>");
+	if ((gbk_lto_bpf == gbo_lto)
+		|| (gbk_targfam_fbsd == gbo_targfam)
+		|| CurUseAllFiles)
+	{
+		if ((gbk_apifam_osx == gbo_apifam)
+			|| (gbk_apifam_cco == gbo_apifam)
+			|| (gbk_targfam_fbsd == gbo_targfam))
+		{
+			WriteDestFileLn("#include <netinet/in.h>");
+		}
+	}
+	if ((gbk_lto_bpf == gbo_lto) || CurUseAllFiles) {
+		if ((gbk_apifam_osx == gbo_apifam)
+			|| (gbk_apifam_cco == gbo_apifam))
+		{
+			/* -lto bpf is so far only implemented for OS X */
+			WriteDestFileLn("#include <net/if.h>");
+			WriteDestFileLn("#include <net/route.h>");
+			WriteDestFileLn("#include <net/if_dl.h>");
+			WriteDestFileLn("#include <sys/select.h>");
+			WriteDestFileLn("#include <sys/ioctl.h>");
+			WriteDestFileLn("#include <sys/sysctl.h>");
+			WriteDestFileLn("#include <net/bpf.h>");
+		}
+	}
+	if ((gbk_lto_udp == gbo_lto) || CurUseAllFiles) {
+#if 0
+		WriteDestFileLn("#include <ifaddrs.h>");
+#endif
+		WriteCompCondBool("use_SO_REUSEPORT",
+			(gbk_apifam_osx == gbo_apifam)
+				|| (gbk_apifam_cco == gbo_apifam)
+				|| ((gbk_apifam_xwn == gbo_apifam)
+					&& (gbk_targfam_fbsd == gbo_targfam)));
+	}
 }
 
-LOCALPROC WriteCommonCNFGRAPIContents(void)
+LOCALPROC WriteCommonCNFUIOSGContents(void)
 {
 	WriteDestFileLn("/*");
 	++DestFileIndent;
 		WriteDestFileLn(
-			"Configuration options used by platform specific code.");
+			"see comment in OSGCOMUI.h");
 		WriteConfigurationWarning();
 	--DestFileIndent;
 	WriteDestFileLn("*/");
@@ -94,14 +120,14 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 			WriteDestFileLn("#include <unistd.h>");
 				/* for nanosleep */
 
-			if (WantLocalTalk) {
-				WriteOSXLocalTalkCNFGRAPI();
+			if (WantLocalTalk || CurUseAllFiles) {
+				WriteOSXLocalTalkCNFUIOSG();
 			}
 		}
 	} else if (gbk_apifam_cco == gbo_apifam) {
 		WriteDestFileLn("#import <Cocoa/Cocoa.h>");
 #if MayUseSound
-		if (MySoundEnabled) {
+		if (MySoundEnabled || CurUseAllFiles) {
 			WriteDestFileLn("#include <CoreAudio/CoreAudio.h>");
 			WriteDestFileLn("#include <AudioUnit/AudioUnit.h>");
 		}
@@ -114,11 +140,12 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 		WriteDestFileLn("#include <string.h>");
 		WriteDestFileLn("#include <sys/param.h>");
 		WriteDestFileLn("#include <sys/time.h>");
-		if (WantUnTranslocate) {
+		if (WantUnTranslocate || CurUseAllFiles) {
 			WriteDestFileLn("#include <dlfcn.h>");
 		}
-		if (WantLocalTalk) {
-			WriteOSXLocalTalkCNFGRAPI();
+		if (WantLocalTalk || CurUseAllFiles) {
+			WriteDestFileLn("#include <unistd.h>");
+			WriteOSXLocalTalkCNFUIOSG();
 		}
 	} else if (gbk_apifam_xwn == gbo_apifam) {
 		blnr HaveAppPathLink = falseblnr;
@@ -161,12 +188,15 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 		}
 #if MayUseSound
 		if ((gbk_sndapi_alsa == gbo_sndapi)
-			|| (gbk_sndapi_ddsp == gbo_sndapi))
+			|| (gbk_sndapi_ddsp == gbo_sndapi)
+			|| CurUseAllFiles)
 		{
 			WriteDestFileLn("#include <errno.h>");
 		}
 #endif
 		if (HaveAppPathLink /* for readlink */
+			|| WantLocalTalk
+			|| CurUseAllFiles
 #if MayUseSound
 			|| (gbk_sndapi_ddsp == gbo_sndapi)
 #endif
@@ -178,7 +208,7 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 			WriteDestFileLn("#include <sys/sysctl.h>");
 		}
 #if MayUseSound
-		if (MySoundEnabled) {
+		if (MySoundEnabled || CurUseAllFiles) {
 			switch (gbo_sndapi) {
 				case gbk_sndapi_alsa:
 					WriteDestFileLn("#include <dlfcn.h>");
@@ -199,6 +229,9 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 			}
 		}
 #endif
+		if (WantLocalTalk || CurUseAllFiles) {
+			WriteOSXLocalTalkCNFUIOSG();
+		}
 
 		WriteBlankLineToDestFile();
 		WriteCompCondBool("CanGetAppPath",
@@ -228,7 +261,7 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 		WriteCompCondBool("HaveSysctlPath", HaveSysctlPath);
 
 #if MayUseSound
-		if (MySoundEnabled) {
+		if (MySoundEnabled || CurUseAllFiles) {
 			if (gbk_sndapi_ddsp == gbo_sndapi) {
 				WriteBgnDestFileLn();
 				WriteCStrToDestFile("#define AudioDevPath \"");
@@ -318,6 +351,11 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 			WriteDestFileLn("#include <aygshell.h>");
 			WriteDestFileLn("#include <commdlg.h>");
 		}
+		if (WantLocalTalk || CurUseAllFiles) {
+			WriteDestFileLn("#include <winsock.h>");
+			WriteDestFileLn("#define use_SO_REUSEPORT 0");
+			WriteDestFileLn("#define use_winsock 1");
+		}
 		if (gbk_ide_mvc == cur_ide) {
 			WriteBlankLineToDestFile();
 			WriteDestFileLn("#define _tWinMain WinMain");
@@ -397,7 +435,7 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 	}
 
 #if MayUseSound
-	if (MySoundEnabled) {
+	if (MySoundEnabled || CurUseAllFiles) {
 		if (gbk_sndapi_alsa == gbo_sndapi)
 		if (gbk_cpufam_arm == gbo_cpufam)
 		{
@@ -406,17 +444,19 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 	}
 #endif
 
+	if (gbk_targfam_wnce == gbo_targfam) {
+		WriteBlankLineToDestFile();
+		WriteDestFileLn("#define EnableShellLinks 0");
+		WriteDestFileLn("#define EnableDragDrop 0");
+		WriteDestFileLn("#define UseTimerThread 0");
+	} else if (gbk_targfam_lnds == gbo_targfam) {
+		WriteDestFileLn("#define EnableDragDrop 0");
+	} else {
+		WriteDestFileLn("#define EnableDragDrop 1");
+	}
+
 	if (HaveMacBundleApp) {
 		WriteDestFileLn("#define MyAppIsBundle 1");
-	}
-	if (gbk_apifam_cco == gbo_apifam) {
-		WriteCompCondBool("WantUnTranslocate",
-			WantUnTranslocate);
-	}
-	if (gbk_apifam_win == gbo_apifam) {
-		if (WantIconMaster) {
-			WriteDestFileLn("#define InstallFileIcons 1");
-		}
 	}
 	if ((gbk_apifam_mac == gbo_apifam)
 		|| (gbk_apifam_osx == gbo_apifam))
@@ -427,5 +467,26 @@ LOCALPROC WriteCommonCNFGRAPIContents(void)
 		WriteCStrToDestFile(kMacCreatorSig);
 		WriteSingleQuoteToDestFile();
 		WriteEndDestFileLn();
+	}
+}
+
+
+LOCALPROC WriteCommonCNFUDOSGContents(void)
+{
+	WriteDestFileLn("/*");
+	++DestFileIndent;
+		WriteDestFileLn(
+			"see comment in OSGCOMUD.h");
+		WriteConfigurationWarning();
+	--DestFileIndent;
+	WriteDestFileLn("*/");
+
+	WriteBlankLineToDestFile();
+
+	if (WantUnTranslocate) {
+		WriteDestFileLn("#define WantUnTranslocate 1");
+	}
+	if (WantIconMaster) {
+		WriteDestFileLn("#define InstallFileIcons 1");
 	}
 }

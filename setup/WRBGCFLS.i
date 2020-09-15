@@ -326,8 +326,13 @@ LOCALPROC WriteBashGccMakeFile(void)
 				WriteCStrToDestFile(" `pkg-config --libs gtk+-2.0`");
 			} else if (gbk_apifam_sdl == gbo_apifam) {
 				if (gbk_targfam_mach == gbo_targfam) {
+#if 0
 					WriteCStrToDestFile(" -L/usr/local/lib -lSDLmain"
 						" -lSDL -Wl,-framework,Cocoa");
+#endif
+					WriteCStrToDestFile(
+						" bld/SDLMain.o -L/usr/local/lib"
+						" -Wl,-framework,Cocoa,-framework,SDL");
 				} else {
 					WriteCStrToDestFile(" -lSDL");
 				}
@@ -346,12 +351,17 @@ LOCALPROC WriteBashGccMakeFile(void)
 					WriteCStrToDestFile(" -lposix4");
 				}
 #if MayUseSound
-				if (gbk_sndapi_alsa == gbo_sndapi) {
+				if ((gbk_sndapi_alsa == gbo_sndapi)
+					|| CurUseAllFiles)
+				{
 					WriteCStrToDestFile(" -ldl");
 #if 0
 					WriteCStrToDestFile(" -lasound");
 #endif
-				} else if (gbk_sndapi_ddsp == gbo_sndapi) {
+				}
+				if ((gbk_sndapi_ddsp == gbo_sndapi)
+					|| CurUseAllFiles)
+				{
 					if ((gbk_targfam_nbsd == gbo_targfam)
 						|| (gbk_targfam_obsd == gbo_targfam))
 					{

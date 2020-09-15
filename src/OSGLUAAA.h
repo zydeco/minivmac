@@ -1,5 +1,5 @@
 /*
-	MYOSGLUE.h
+	OSGLUAAA.h
 
 	Copyright (C) 2006 Philip Cummins, Richard F. Bannister,
 		Paul C. Pratt
@@ -16,21 +16,21 @@
 */
 
 /*
-	MY Operating System GLUE.
+	Operating System GLUe AAA
 
-	header file for operating system dependent code.
+	header file for operating system dependent code (OSGLUxxx).
 	the same header is used for all platforms.
+	(The "AAA" is just to put it alphabetically in front
+	of the OSGLUxxx files.)
 
 	This code is descended from Richard F. Bannister's Macintosh
 	port of vMac, by Philip Cummins.
 */
 
-#ifdef MYOSGLUE_H
-#ifndef AllFiles
+#ifdef OSGLUAAA_H
 #error "header already included"
-#endif
 #else
-#define MYOSGLUE_H
+#define OSGLUAAA_H
 #endif
 
 
@@ -38,14 +38,23 @@
 EXPORTOSGLUPROC WarnMsgAbnormalID(ui4r id);
 #endif
 
+#if NonDiskProtect
+EXPORTOSGLUPROC WarnMsgUnsupportedDisk(void);
+#endif
+
 #if dbglog_HAVE
 EXPORTOSGLUPROC dbglog_writeCStr(char *s);
 EXPORTOSGLUPROC dbglog_writeReturn(void);
-EXPORTOSGLUPROC dbglog_writeHex(ui5r x);
-EXPORTOSGLUPROC dbglog_writeNum(ui5r x);
+EXPORTOSGLUPROC dbglog_writeHex(uimr x);
+EXPORTOSGLUPROC dbglog_writeNum(uimr x);
 EXPORTOSGLUPROC dbglog_writeMacChar(ui3r x);
 EXPORTOSGLUPROC dbglog_writeln(char *s);
+EXPORTOSGLUPROC dbglog_writelnHex(char *s, uimr x);
 EXPORTOSGLUPROC dbglog_writelnNum(char *s, simr v);
+#endif
+
+#if dbglog_HAVE
+EXPORTOSGLUPROC MacMsgDebugAlert(char *s);
 #endif
 
 EXPORTOSGLUPROC ReserveAllocOneBlock(ui3p *p, uimr n, ui3r align,
@@ -259,6 +268,12 @@ EXPORTOSGLUPROC MySound_EndWrite(ui4r actL);
 
 #if EmLocalTalk
 
+EXPORTVAR(ui3b, LT_NodeHint)
+
+#if LT_MayHaveEcho
+EXPORTVAR(blnr, CertainlyNotMyPacket)
+#endif
+
 #define LT_TxBfMxSz 1024
 EXPORTVAR(ui3p, LT_TxBuffer)
 EXPORTVAR(ui4r, LT_TxBuffSz)
@@ -438,4 +453,9 @@ EXPORTOSGLUPROC MyEvtQOutDone(void);
 /* not Apple key codes, only for Mini vMac */
 
 #define MKC_CM 0x80
+#define MKC_real_CapsLock 0x81
+	/*
+		for use in platform specific code
+		when CapsLocks need special handling.
+	*/
 #define MKC_None 0xFF

@@ -17,23 +17,43 @@
 	program SPecific write OTHer ConFiguration files
 */
 
-LOCALPROC WriteAppCNFGGLOBContents(void)
+LOCALPROC WriteAppCNFUIALLContents(void)
 {
-	WriteCommonCNFGGLOBContents();
+	WriteCommonCNFUIALLContents();
 
 	if (cur_mIIorIIX) {
 		Write64bitConfig();
 	}
+}
 
-	WriteBlankLineToDestFile();
-	WriteDestFileLn(
-		"/* capabilities provided by platform specific code */");
+LOCALPROC WriteAppCNFUIPICcontents(void)
+{
+	WriteDestFileLn("/*");
+	++DestFileIndent;
+		WriteDestFileLn(
+			"see comment in PICOMMON.h");
+		WriteConfigurationWarning();
+	--DestFileIndent;
+	WriteDestFileLn("*/");
+}
+
+
+
+LOCALPROC WriteAppCNFUDALLContents(void)
+{
+	WriteDestFileLn("/*");
+	++DestFileIndent;
+		WriteDestFileLn(
+			"see comment in OSGCOMUD.h");
+		WriteConfigurationWarning();
+	--DestFileIndent;
+	WriteDestFileLn("*/");
 
 	WriteBlankLineToDestFile();
 
 	WriteCompCondBool("MySoundEnabled", MySoundEnabled);
 
-	WriteAppSpecificCNFGGLOBoptions();
+	WriteAppSpecificCNFUDALLoptions();
 }
 
 LOCALPROC WriteBldOpts(void)
@@ -44,11 +64,62 @@ LOCALPROC WriteBldOpts(void)
 	WrtOptSPSettings();
 }
 
-LOCALPROC WriteAppCNFGRAPIContents(void)
+LOCALPROC WriteAppCNFUIOSGContents(void)
 {
-	WriteCommonCNFGRAPIContents();
+	WriteCommonCNFUIOSGContents();
 
-	WriteAppSpecificCNFGRAPIoptions();
+	{
+		char *s = nullpr;
+
+		switch (gbo_apifam) {
+			case gbk_apifam_mac:
+				s = "MAC";
+				break;
+			case gbk_apifam_osx:
+				s = "OSX";
+				break;
+			case gbk_apifam_win:
+				s = "WIN";
+				break;
+			case gbk_apifam_xwn:
+				s = "XWN";
+				break;
+			case gbk_apifam_nds:
+				s = "NDS";
+				break;
+			case gbk_apifam_gtk:
+				s = "GTK";
+				break;
+			case gbk_apifam_sdl:
+			case gbk_apifam_sd2:
+				s = "SDL";
+				break;
+			case gbk_apifam_cco:
+				s = "CCO";
+				break;
+		}
+
+		if (nullpr != s) {
+			WriteBgnDestFileLn();
+			WriteCStrToDestFile("#define WantOSGLU");
+			WriteCStrToDestFile(s);
+			WriteCStrToDestFile(" 1");
+			WriteEndDestFileLn();
+		}
+	}
+
+	WriteBlankLineToDestFile();
+	WriteCDefQuote("kStrAppName", WriteStrAppUnabrevName);
+	WriteCDefQuote("kAppVariationStr", WriteAppVariationStr);
+	WriteCDefQuote("kStrCopyrightYear", WriteAppCopyrightYearStr);
+	WriteCDefQuote("kMaintainerName", WriteMaintainerName);
+	WriteCDefQuote("kStrHomePage", WriteHomePage);
+}
+
+LOCALPROC WriteAppCNFUDOSGContents(void)
+{
+	WriteCommonCNFUDOSGContents();
+	WriteAppSpecificCNFUDOSGoptions();
 
 	WriteBlankLineToDestFile();
 	WriteBgnDestFileLn();
@@ -570,12 +641,38 @@ LOCALPROC WriteAppSOUNDGLUcontents(void)
 	WriteEndDestFileLn();
 }
 
-LOCALPROC WriteAppEMCONFIGcontents(void)
+LOCALPROC WriteAppLOCALTLKcontents(void)
+{
+	char *s;
+
+	switch (gbo_lto) {
+		case gbk_lto_bpf:
+			s = "BPF";
+			break;
+		case gbk_lto_udp:
+			s = "UDP";
+			break;
+		default:
+			s = "???";
+			break;
+	}
+
+	WriteBgnDestFileLn();
+	WriteCStrToDestFile("#include ");
+	WriteQuoteToDestFile();
+	WriteCStrToDestFile("LTOVR");
+	WriteCStrToDestFile(s);
+	WriteCStrToDestFile(".h");
+	WriteQuoteToDestFile();
+	WriteEndDestFileLn();
+}
+
+LOCALPROC WriteAppCNFUDPICcontents(void)
 {
 	WriteDestFileLn("/*");
 	++DestFileIndent;
 		WriteDestFileLn(
-			"Configuration options used by platform independent code.");
+			"see comment in PICOMMON.h");
 		WriteConfigurationWarning();
 	--DestFileIndent;
 	WriteDestFileLn("*/");
@@ -586,11 +683,13 @@ LOCALPROC WriteAppEMCONFIGcontents(void)
 	WriteCompCondBool("EmADB", EmADB);
 	WriteCompCondBool("EmRTC", EmRTC);
 	WriteCompCondBool("EmPMU", EmPMU);
+	WriteCompCondBool("EmVIA1", trueblnr);
 	WriteCompCondBool("EmVIA2", EmVIA2);
 	WriteCompCondBool("Use68020", em_cpu_vers >= 2);
 	WriteCompCondBool("EmFPU",
 		cur_mIIorIIX);
 	WriteCompCondBool("EmMMU", falseblnr);
+	WriteCompCondBool("EmClassicSnd", EmClassicSnd);
 	WriteCompCondBool("EmASC", EmASC);
 
 	WriteBlankLineToDestFile();
@@ -614,6 +713,17 @@ LOCALPROC WriteAppEMCONFIGcontents(void)
 	WriteBlankLineToDestFile();
 	WriteCompCondBool("WantCycByPriOp", timingacc != 0);
 	WriteCompCondBool("WantCloserCyc", timingacc >= 2);
+
+	WriteBlankLineToDestFile();
+	WriteDestFileLn("#define kAutoSlowSubTicks 16384");
+	WriteBgnDestFileLn();
+	WriteCStrToDestFile("#define kAutoSlowTime ");
+	if (cur_mIIorIIX) {
+		WriteCStrToDestFile("60");
+	} else {
+		WriteCStrToDestFile("34");
+	}
+	WriteEndDestFileLn();
 
 	if (gbk_ide_mvc == cur_ide) {
 		if (gbk_cpufam_x64 == gbo_cpufam) {
@@ -882,15 +992,28 @@ LOCALPROC WriteAppEMCONFIGcontents(void)
 
 LOCALPROC WriteAppSpecificConfigFiles(void)
 {
+	if (gbk_ide_prt != cur_ide) {
+		WriteADstFile1("my_config_d",
+			"CNFUIOSG", ".h", nullpr,
+			WriteAppCNFUIOSGContents);
+		WriteADstFile1("my_config_d",
+			"CNFUIALL", ".h", nullpr,
+			WriteAppCNFUIALLContents);
+		WriteADstFile1("my_config_d",
+			"CNFUIPIC", ".h", nullpr,
+			WriteAppCNFUIPICcontents);
+	}
+
 	WriteADstFile1("my_config_d",
-		"CNFGGLOB", ".h", "C Configuration file",
-		WriteAppCNFGGLOBContents);
+		"CNFUDOSG", ".h", nullpr,
+		WriteAppCNFUDOSGContents);
 	WriteADstFile1("my_config_d",
-		"CNFGRAPI", ".h", "C API Configuration file",
-		WriteAppCNFGRAPIContents);
+		"CNFUDALL", ".h", nullpr,
+		WriteAppCNFUDALLContents);
 	WriteADstFile1("my_config_d",
-		"EMCONFIG", ".h", "C Platform Independent Configuration file",
-		WriteAppEMCONFIGcontents);
+		"CNFUDPIC", ".h", nullpr,
+		WriteAppCNFUDPICcontents);
+
 	WriteADstFile1("my_config_d",
 		"STRCONST", ".h", "Language Configuration file",
 		WriteAppSTRCONSTcontents);
@@ -899,5 +1022,11 @@ LOCALPROC WriteAppSpecificConfigFiles(void)
 		WriteADstFile1("my_config_d",
 			"SOUNDGLU", ".h", "Sound Configuration file",
 			WriteAppSOUNDGLUcontents);
+	}
+
+	if (gbo_lto != gbk_lto_none) {
+		WriteADstFile1("my_config_d",
+			"LOCALTLK", ".h", "LocalTalk Configuration file",
+			WriteAppLOCALTLKcontents);
 	}
 }

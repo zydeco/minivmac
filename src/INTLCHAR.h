@@ -1699,6 +1699,18 @@ LOCALVAR blnr WantFullScreen = (WantInitFullScreen != 0);
 LOCALVAR blnr WantMagnify = (WantInitMagnify != 0);
 #endif
 
+#ifndef NeedRequestInsertDisk
+#define NeedRequestInsertDisk 0
+#endif
+
+#ifndef NeedDoMoreCommandsMsg
+#define NeedDoMoreCommandsMsg 0
+#endif
+
+#ifndef NeedDoAboutMsg
+#define NeedDoAboutMsg 0
+#endif
+
 #if NeedRequestInsertDisk
 LOCALVAR blnr RequestInsertDisk = falseblnr;
 #endif

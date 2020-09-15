@@ -20,12 +20,15 @@
 
 #define kStrAppName "Mini vMac"
 #define kStrAppAbbrev "minivmac" /* [a-z0-9_]{1,8} */
-#define MajorVersion 36
-#define MinorVersion 04
-#define kStrCopyrightYear "2018"
+#define MajorVersion 37
+#define MinorVersion 00
+#define kStrCopyrightYear "2020"
 #define kMacCreatorSig "MnvM"
 #define kBundleIdentifier "com.gryphel.minivmac"
 #define kShortDescription "miniature Macintosh emulator"
+
+#define kMaintainerName "Paul C. Pratt"
+#define kStrHomePage "https://www.gryphel.com/"
 
 #define Have_SPBLDOPT 1
 #define Have_SPCNFGGL 1

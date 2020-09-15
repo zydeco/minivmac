@@ -15,6 +15,7 @@
 
 /*
 	WRite "CNFGGLob.h"
+		(renamed to "CNFUIALL.h")
 */
 
 
@@ -31,14 +32,12 @@ LOCALPROC WriteConfigurationWarning(void)
 		"you know what you're doing.");
 }
 
-LOCALPROC WriteCommonCNFGGLOBContents(void)
+LOCALPROC WriteCommonCNFUIALLContents(void)
 {
 	WriteDestFileLn("/*");
 	++DestFileIndent;
 		WriteDestFileLn(
-			"Configuration options used by both platform specific");
-		WriteDestFileLn(
-			"and platform independent code.");
+			"see comment in OSGCOMUI.h");
 		WriteConfigurationWarning();
 	--DestFileIndent;
 	WriteDestFileLn("*/");
@@ -47,7 +46,7 @@ LOCALPROC WriteCommonCNFGGLOBContents(void)
 	WriteDestFileLn("/* adapt to current compiler/host processor */");
 
 	if (gbk_ide_mw8 == cur_ide) {
-		WriteDestFileLn("/* make sure this is correct CNFGGLOB */");
+		WriteDestFileLn("/* make sure this is correct CNFUIALL */");
 
 		WriteCheckPreDef("__MWERKS__");
 		switch (gbo_cpufam) {
@@ -240,18 +239,18 @@ LOCALPROC WriteCommonCNFGGLOBContents(void)
 			" applied to unsigned type warning */");
 		WriteDestFileLn("#pragma warning(disable : 4146)");
 
-	if (cur_mIIorIIX
-		|| (em_cpu_vers >= 2))
-	{
-		/* C4127: conditional expression is constant */
-		/*
-			C4701: local variable may have been used without having
-			been initialized
-		*/
-		WriteBlankLineToDestFile();
-		WriteDestFileLn("/* more warnings */");
-		WriteDestFileLn("#pragma warning(disable : 4127 4701)");
-	}
+		if (cur_mIIorIIX
+			|| (em_cpu_vers >= 2))
+		{
+			/* C4127: conditional expression is constant */
+			/*
+				C4701: local variable may have been used without having
+				been initialized
+			*/
+			WriteBlankLineToDestFile();
+			WriteDestFileLn("/* more warnings */");
+			WriteDestFileLn("#pragma warning(disable : 4127 4701)");
+		}
 
 	} else if (gbk_ide_plc == cur_ide) {
 		WriteBlankLineToDestFile();

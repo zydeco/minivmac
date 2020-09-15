@@ -25,13 +25,7 @@
 	Support for "Twiggy" Mac by Mathew Hybler.
 */
 
-#ifndef AllFiles
-#include "SYSDEPNS.h"
-#include "MYOSGLUE.h"
-#include "ENDIANAC.h"
-#include "EMCONFIG.h"
-#include "GLOBGLUE.h"
-#endif
+#include "PICOMMON.h"
 
 #include "ROMEMDEV.h"
 

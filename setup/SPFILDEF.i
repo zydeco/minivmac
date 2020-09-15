@@ -21,7 +21,7 @@
 
 /* --- list of source files --- */
 
-static void DoMYOSGLUEdepends(tDoOneDepends p)
+static void DoOSGLUdepends(tDoOneDepends p)
 {
 	{
 		char *s = nullpr;
@@ -71,7 +71,23 @@ static void DoMYOSGLUEdepends(tDoOneDepends p)
 	p(kDepDirCSrc, "INTLCHAR.h");
 	p(kDepDirCSrc, "COMOSGLU.h");
 	if (WantLocalTalk) {
-		p(kDepDirCSrc, "BPFILTER.h");
+		{
+			char *s = nullpr;
+
+			switch (gbo_lto) {
+				case gbk_lto_bpf:
+					s = "LTOVRBPF.h";
+					break;
+				case gbk_lto_udp:
+					s = "LTOVRUDP.h";
+					break;
+			}
+
+			if (nullpr != s) {
+				p(kDepDirCSrc, s);
+			}
+		}
+		p(kDepDirCnfg, "LOCALTLK.h");
 	}
 	if (WantAltKeysMode) {
 		p(kDepDirCSrc, "ALTKEYSM.h");
@@ -126,11 +142,13 @@ static void DoAllSrcFiles(tDoOneCFile p)
 		|| (gbk_apifam_sd2 == gbo_apifam);
 	blnr WantSCRNTRNS = WantSCRNMAPR && (cur_ScrnDpth != 0);
 
-	p("CNFGRAPI", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
-	p("CNFGGLOB", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
-	p("SYSDEPNS", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
+	p("CNFUIOSG", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("CNFUIALL", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("DFCNFCMP", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
 	p("ENDIANAC", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
-	p("MYOSGLUE", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
+	p("CNFUDOSG", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("CNFUDALL", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("OSGLUAAA", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
 
 	p("STRCNENG", kDepDirCSrc,
 		CSrcFlagsUseHdrIf(gbk_lang_eng == gbo_lang), nullpr);
@@ -156,10 +174,18 @@ static void DoAllSrcFiles(tDoOneCFile p)
 		CSrcFlagsUseHdrIf(gbk_lang_srl == gbo_lang), nullpr);
 
 	p("STRCONST", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("OSGCOMUI", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
+	p("OSGCOMUD", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
 	p("INTLCHAR", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
 	p("COMOSGLU", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
-	p("BPFILTER", kDepDirCSrc,
+	p("LOCALTLK", kDepDirCnfg,
 		CSrcFlagsUseHdrIf(WantLocalTalk), nullpr);
+	p("LTOVRBPF", kDepDirCSrc,
+		CSrcFlagsUseHdrIf(WantLocalTalk && (gbk_lto_bpf == gbo_lto)),
+		nullpr);
+	p("LTOVRUDP", kDepDirCSrc,
+		CSrcFlagsUseHdrIf(WantLocalTalk && (gbk_lto_udp == gbo_lto)),
+		nullpr);
 	p("ALTKEYSM", kDepDirCSrc,
 		CSrcFlagsUseHdrIf(WantAltKeysMode), nullpr);
 	p("ACTVCODE", kDepDirCSrc,
@@ -188,44 +214,43 @@ static void DoAllSrcFiles(tDoOneCFile p)
 	p("OSGLUMAC", kDepDirCSrc,
 		kCSrcFlgmUseAPI
 			| CSrcFlagsUseSrcIf(gbk_apifam_mac == gbo_apifam),
-		DoMYOSGLUEdepends);
+		DoOSGLUdepends);
 	p("OSGLUOSX", kDepDirCSrc,
 		kCSrcFlgmUseAPI
 			| CSrcFlagsUseSrcIf(gbk_apifam_osx == gbo_apifam),
-		DoMYOSGLUEdepends);
+		DoOSGLUdepends);
 	p("OSGLUWIN", kDepDirCSrc,
 		kCSrcFlgmUseAPI
 			| CSrcFlagsUseSrcIf(gbk_apifam_win == gbo_apifam),
-		DoMYOSGLUEdepends);
+		DoOSGLUdepends);
 	p("OSGLUXWN", kDepDirCSrc,
 		kCSrcFlgmUseAPI
 			| CSrcFlagsUseSrcIf(gbk_apifam_xwn == gbo_apifam),
-		DoMYOSGLUEdepends);
+		DoOSGLUdepends);
 	p("OSGLUNDS", kDepDirCSrc,
 		kCSrcFlgmUseAPI
 			| CSrcFlagsUseSrcIf(gbk_apifam_nds == gbo_apifam),
-		DoMYOSGLUEdepends);
+		DoOSGLUdepends);
 	p("OSGLUGTK", kDepDirCSrc,
 		kCSrcFlgmUseAPI
 			| CSrcFlagsUseSrcIf(gbk_apifam_gtk == gbo_apifam),
-		DoMYOSGLUEdepends);
+		DoOSGLUdepends);
 	p("OSGLUSDL", kDepDirCSrc,
 		kCSrcFlgmUseAPI
-			| CSrcFlagsUseSrcIf(gbk_apifam_sdl == gbo_apifam),
-		DoMYOSGLUEdepends);
-	p("OSGLUSD2", kDepDirCSrc,
-		kCSrcFlgmUseAPI
-			| CSrcFlagsUseSrcIf(gbk_apifam_sd2 == gbo_apifam),
-		DoMYOSGLUEdepends);
+			| CSrcFlagsUseSrcIf((gbk_apifam_sdl == gbo_apifam)
+				|| (gbk_apifam_sd2 == gbo_apifam)),
+		DoOSGLUdepends);
 	p("OSGLUCCO", kDepDirCSrc,
 		kCSrcFlgmUseAPI | kCSrcFlgmOjbc
 			| CSrcFlagsUseSrcIf(gbk_apifam_cco == gbo_apifam),
-		DoMYOSGLUEdepends);
+		DoOSGLUdepends);
 
-	p("EMCONFIG", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("CNFUIPIC", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("CNFUDPIC", kDepDirCnfg, kCSrcFlgmNoSource, nullpr);
+	p("PICOMMON", kDepDirCSrc, kCSrcFlgmNoSource, nullpr);
 	p("GLOBGLUE", kDepDirCSrc, kCSrcFlgmNone, nullpr);
 	p("M68KITAB", kDepDirCSrc, kCSrcFlgmNone, nullpr);
-	p("DISAM68K", kDepDirCSrc, CSrcFlagsUseIf(WantDisasm), nullpr);
+	p("DISAM68K", kDepDirCSrc, CSrcFlagsUseIfA(WantDisasm), nullpr);
 	p("FPMATHEM", kDepDirCSrc,
 		CSrcFlagsUseHdrIf(cur_mIIorIIX),
 		nullpr);
@@ -244,10 +269,10 @@ static void DoAllSrcFiles(tDoOneCFile p)
 		*/
 
 	p("VIAEMDEV", kDepDirCSrc, kCSrcFlgmNone, nullpr);
-	p("VIA2EMDV", kDepDirCSrc, CSrcFlagsUseIf(EmVIA2), nullpr);
+	p("VIA2EMDV", kDepDirCSrc, CSrcFlagsUseIfA(EmVIA2), nullpr);
 	p("IWMEMDEV", kDepDirCSrc, kCSrcFlgmNone, nullpr);
 	p("SCCEMDEV", kDepDirCSrc, kCSrcFlgmNone, nullpr);
-	p("RTCEMDEV", kDepDirCSrc, CSrcFlagsUseIf(EmRTC), nullpr);
+	p("RTCEMDEV", kDepDirCSrc, CSrcFlagsUseIfA(EmRTC), nullpr);
 	p("SCRNHACK", kDepDirCSrc,
 		CSrcFlagsUseHdrIf(NeedScrnHack), nullpr);
 	p("HPMCHACK", kDepDirCSrc,
@@ -256,18 +281,15 @@ static void DoAllSrcFiles(tDoOneCFile p)
 	p("SCSIEMDV", kDepDirCSrc, kCSrcFlgmNone, nullpr);
 	p("SONYEMDV", kDepDirCSrc, kCSrcFlgmNone, nullpr);
 	p("SCRNEMDV", kDepDirCSrc, kCSrcFlgmNone, nullpr);
-	p("VIDEMDEV", kDepDirCSrc, CSrcFlagsUseIf(EmVidCard), nullpr);
+	p("VIDEMDEV", kDepDirCSrc, CSrcFlagsUseIfA(EmVidCard), nullpr);
 	p("MOUSEMDV", kDepDirCSrc, kCSrcFlgmNone, nullpr);
-	p("KBRDEMDV", kDepDirCSrc, CSrcFlagsUseIf(EmClassicKbrd), nullpr);
+	p("KBRDEMDV", kDepDirCSrc, CSrcFlagsUseIfA(EmClassicKbrd), nullpr);
 	p("ADBSHARE", kDepDirCSrc,
 		CSrcFlagsUseHdrIf(cur_mdl >= gbk_mdl_SE), nullpr);
-	p("ADBEMDEV", kDepDirCSrc, CSrcFlagsUseIf(EmADB), nullpr);
-	p("PMUEMDEV", kDepDirCSrc, CSrcFlagsUseIf(EmPMU), nullpr);
-	p("ASCEMDEV", kDepDirCSrc, CSrcFlagsUseIf(EmASC), nullpr);
-	p("SNDEMDEV", kDepDirCSrc,
-		CSrcFlagsUseIf((! EmASC) && (gbk_mdl_PB100 != cur_mdl)
-			&& MySoundEnabled),
-		nullpr);
+	p("ADBEMDEV", kDepDirCSrc, CSrcFlagsUseIfA(EmADB), nullpr);
+	p("PMUEMDEV", kDepDirCSrc, CSrcFlagsUseIfA(EmPMU), nullpr);
+	p("ASCEMDEV", kDepDirCSrc, CSrcFlagsUseIfA(EmASC), nullpr);
+	p("SNDEMDEV", kDepDirCSrc, CSrcFlagsUseIfA(EmClassicSnd), nullpr);
 	p("PROGMAIN", kDepDirCSrc, kCSrcFlgmNone, nullpr);
 }
 
