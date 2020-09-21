@@ -179,6 +179,11 @@ RomBase EQU $00400000
 	Lea.L     (DrvQHdr),A1
 	Jmp       (RomBase + 2848)
 
+VBLTaskFreq EQU $7FFF
+
+VBLTaskProc
+	MOVE.W     VBLTaskFreq, $000A(A0)
+	; fallthrough to return
 
 NullTaskProc
 	RTS
@@ -241,6 +246,18 @@ DOpen
 	MOVE.L     A3,D0
 	BEQ.S      @3
 
+	; Some games (Wintergames) manipulate the VBL
+	; queue directly, and will break if the queue 
+	; was empty. Add a VBL task to prevent this.
+
+	MOVE.L     #14, D0
+	DC.W       $A71E ; _NewPtr    ,Sys,Clear
+	LEA        VBLTaskProc,A1
+	MOVE.W     #1,$0004(A0) ; task type
+	MOVE.L     A1,$0006(A0) ; task procedure
+	MOVE.W     VBLTaskFreq,$000A(A0)
+	DC.W       $A033 ; _VInstall
+	
 	; There is apparently a bug in the time manager
 	; in System 6.0.8, which will cause a crash
 	; if there are no installed time
