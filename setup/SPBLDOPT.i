@@ -1846,11 +1846,23 @@ LOCALFUNC uimr dfo_em_cpu_vers(void)
 
 LOCALFUNC tMyErr ChooseEmCpuVers(void)
 {
+	tMyErr err;
+
+	err = kMyErr_noErr;
+
 	if (0 == olv_em_cpu_vers) {
 		em_cpu_vers = dfo_em_cpu_vers();
+	} else {
+		if (cur_mIIorIIX) {
+			if (0 == em_cpu_vers) {
+				err = ReportParseFailure(
+					"68000 cpu (-em-cpu) "
+					"does not work with this model (-m)");
+			}
+		}
 	}
 
-	return kMyErr_noErr;
+	return err;
 }
 
 LOCALPROC WrtOptEmCpuVers(void)

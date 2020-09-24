@@ -6939,7 +6939,7 @@ LOCALIPROC DoCodeMoveCCREa(void)
 }
 #endif
 
-#if Use68020
+#if Use68020 || EmFPU
 LOCALIPROC DoCodeBraL(void)
 {
 	/* Bra 0110ccccnnnnnnnn */
@@ -6958,7 +6958,7 @@ LOCALIPROC DoCodeBraL(void)
 }
 #endif
 
-#if Use68020
+#if Use68020 || EmFPU
 LOCALPROC SkipiLong(void)
 {
 	V_pc_p += 4;
