@@ -1,6 +1,6 @@
 ;	mydriver.a
 ;
-;	Copyright (C) 2004 Paul C. Pratt
+;	Copyright (C) 2020 Paul C. Pratt, Jesus A. Alvarez
 ;
 ;	You can redistribute this file and/or modify it under the terms
 ;	of version 2 of the GNU General Public License as published by
@@ -179,12 +179,19 @@ RomBase EQU $00400000
 	Lea.L     (DrvQHdr),A1
 	Jmp       (RomBase + 2848)
 
+VBLTaskFreq EQU $0E19
+	; about once a minute, often enough that
+	; a problem with VBLTaskProc noticable.
+
+VBLTaskProc
+	MOVE.W     VBLTaskFreq, $000A(A0)
+	; fall through to return
 
 NullTaskProc
 	RTS
 
 DOpen
-	MOVEM.L    D3-D7/A3,-(A7)
+	MOVEM.L    D3-D7/A3-A4,-(A7)
 	MOVEM.L    A0-A1, -(SP)    ; push ParmBlkPtr, DCtlPtr for C
 
 	SUBQ       #6, A7 ; room for result code, L
@@ -209,12 +216,12 @@ DOpen
 	BNE        @2
 	MOVE.L     D7,D0
 	DC.W       $A71E ; _NewPtr    ,Sys,Clear
-	MOVEA.L    A0,A3
-	MOVE.L     A3,D0
+	MOVEA.L    A0,A4
+	MOVE.L     A4,D0
 	BEQ        @6
 
 	SUBA       #16, A7 ; room for various results
-	MOVE.L     A3, -(A7)
+	MOVE.L     A4, -(A7)
 	MOVE.L     D7, -(A7)
 	SUBQ       #2, A7 ; room for result code
 	MOVE.W     #kCmndSonyOpenB, -(A7)
@@ -237,6 +244,22 @@ DOpen
 
 	TST.W      D0
 	BNE.S      @2
+
+
+	; Patch from Jesus A. Alvarez:
+	; The program Winter Games by Epyx manipulates
+	; the VBL queue directly, and will break if the
+	; queue was empty. Add a VBL task to prevent this
+	; (like the real disk driver does).
+
+	; MOVE.L     #14, D0
+	; DC.W       $A71E ; _NewPtr    ,Sys,Clear
+	LEA        48(A4), A0
+	LEA        VBLTaskProc,A1
+	MOVE.W     #1,$0004(A0) ; task type
+	MOVE.L     A1,$0006(A0) ; task procedure
+	MOVE.W     VBLTaskFreq,$000A(A0)
+	DC.W       $A033 ; _VInstall
 
 	MOVE.L     A3,D0
 	BEQ.S      @3
@@ -287,7 +310,7 @@ DOpen
 	; result code should be in D0 when reach here
 
 	MOVEM.L    (A7)+, A0-A1    ; restore ParmBlkPtr, DCtlPtr
-	MOVEM.L    (A7)+, D3-D7/A3
+	MOVEM.L    (A7)+, D3-D7/A3-A4
 
 	RTS                     ; open is always immediate, must return via RTS
 @6

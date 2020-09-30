@@ -927,6 +927,7 @@ struct MyDriverDat_R {
 	ui4b NumDrives;  /* 24 */
 	ui4b DiskExtn;   /* 26 */
 	TMTask NullTask; /* 28 */
+	VBLTask NullVBLTask; /* 48 */
 	/* total size must be <= FirstDriveVarsOffset */
 };
 
