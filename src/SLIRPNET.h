@@ -302,6 +302,18 @@ LOCALPROC NBP_LookUp(ui3b srcSck, ui3b nbpID, char *object, char *type, char *zo
 
 LOCALPROC DDP_TransmitPacket(ui3b dst, ui3b dstSck, ui3b srcSck, ui3b ddpType, const unsigned char * ddpData, ui4r ddpDataLen)
 {
+#if SLIRP_dolog
+    dbglog_writeCStr("DDP_TransmitPacket: ");
+    dbglog_writeNum(ddpDataLen);
+    dbglog_writeCStr(" data bytes");
+    dbglog_writeReturn();
+#endif
+    if (8 + ddpDataLen > LT_TxBfMxSz) {
+#if SLIRP_dolog
+        dbglog_writeln("DDP_TransmitPacket: too big packet, dropping");
+#endif
+        return;
+    }
     mutex_lock(rx_mutex);
     if (rx_buffer_size) {
         /* this shouldn't happen */
@@ -311,13 +323,6 @@ LOCALPROC DDP_TransmitPacket(ui3b dst, ui3b dstSck, ui3b srcSck, ui3b ddpType, c
         mutex_unlock(rx_mutex);
         return;
     }
-    
-#if SLIRP_dolog
-    dbglog_writeCStr("DDP_TransmitPacket: ");
-    dbglog_writeNum(ddpDataLen);
-    dbglog_writeCStr(" data bytes");
-    dbglog_writeReturn();
-#endif
     ui3p buf = rx_buffer;
     ui4r ddpLen = ddpDataLen + 5;
     buf[0] = dst;
